@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 export const searchStore = defineStore("search", {
   state: () => ({
     searchKey: null,
-    searchField: "team",
+    searchField: "team", //Set default team. because by defalut the page will be homepage and there search input will work for team only. that can change for anohter page like players
   }),
 
   getters: {
@@ -14,7 +14,7 @@ export const searchStore = defineStore("search", {
   actions: {
     setSearchValue(key, field = "team") {
       this.searchKey = key;
-      this.searchField = field;
+      this.searchField = field; //set input type
     },
   },
 });

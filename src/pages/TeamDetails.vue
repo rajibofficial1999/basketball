@@ -101,21 +101,22 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import http from "../request/http";
-import { searchStore } from '../stores/search'
-import playerImage from '../assets/images/player.jpg'
+import http from "../request/http"; //Imported axios instance from "../request/http";
+import { searchStore } from '../stores/search' // Imported pinia search key store 
+import playerImage from '../assets/images/player.jpg' //Imported default image so that can be used if there will not be any image link for players;
 
 const route = useRoute()
-const team = ref(null)
-const players = ref([])
-const bekupPlayers = ref([])
-const searchStorage = searchStore()
+const team = ref(null) // set ref for the team which need to be shown
+const players = ref([]) // set ref for all players
+const bekupPlayers = ref([]) // set ref for all players for backup so that can be used for search term
+const searchStorage = searchStore() // Define the search store from pinia
 
-
+// Get all playars based on team id
 const getTeamPlayer = async (teamId) => {
     try {
         const date = new Date()
 
+        // getting the team data from api using axios request instance
         const { data } = await http.get(`https://v2.nba.api-sports.io/players`, {
             params: {
                 team: teamId,
@@ -123,6 +124,7 @@ const getTeamPlayer = async (teamId) => {
             }
         })
 
+        // maping the Players for filtering their leagues
         let allPlayers = data.response.map(playerData => {
             let filterLeagues = Object.values(playerData.leagues)?.map((item, i) => {
                 item.property = Object.keys(playerData.leagues)[i]
@@ -135,16 +137,15 @@ const getTeamPlayer = async (teamId) => {
             return playerData;
         })
 
-        console.log(players);
-
-        players.value = allPlayers
-        bekupPlayers.value = allPlayers
+        players.value = allPlayers // set value for players ref that is already created
+        bekupPlayers.value = allPlayers // set value for bekupPlayers ref that is already created
 
     } catch (error) {
         console.log(error);
     }
 }
 
+// When component will be successfully rendered/mounted the onMounted function will be called and getting all players data and also the team data
 onMounted(async () => {
     try {
 
@@ -163,7 +164,7 @@ onMounted(async () => {
 
         teamData.leagues = filterLeagues;
 
-        team.value = teamData;
+        team.value = teamData; // set value for team ref that is already created
 
     } catch (error) {
         console.log(error);
@@ -171,7 +172,9 @@ onMounted(async () => {
 })
 
 
+// when user will type/write anything in the search input that is created in layouts/DefaultLayout.vue. we already stored the search value in pinia store in layouts/DefaultLayout.vue. Now watch method is checking that the search input value whether change or not. watch method will be called everytime if search input value will be changed
 watch(() => searchStorage.key, (value) => {
+    // checking the search field whether player or not. bcz we also need the same input form for searching the teams. if its for players then it will be filtered all the players based on user search keyword 
     if (searchStorage.field === 'player') {
         players.value = bekupPlayers.value.filter(({ firstname, lastname }) => {
             if (firstname.toLowerCase().includes(value.toLowerCase())) {

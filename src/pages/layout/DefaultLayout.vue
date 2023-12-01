@@ -15,17 +15,18 @@
 
 <script setup>
 import { useRoute } from 'vue-router'
-import { searchStore } from '../../stores/search'
+import { searchStore } from '../../stores/search' // Imported pinia search key store 
 
-const searchStorage = searchStore()
+const searchStorage = searchStore() // Define the search store from pinia
 const route = useRoute()
 
+// If user type/write anything in the search input this function will be called.
 const handleSearch = (event) => {
-
+    // Checking that the user is typing from which page. whether homepage or players page.
     if (route.params.id) {
-        searchStorage.setSearchValue(event.target.value, 'player')
+        searchStorage.setSearchValue(event.target.value, 'player')  //set the search key and search key type in pinia store. so that can be used for other page/component.
     } else {
-        searchStorage.setSearchValue(event.target.value, 'team')
+        searchStorage.setSearchValue(event.target.value, 'team') //set the search key and search key type in pinia store. so that can be used for other page/component.
     }
 }
 
